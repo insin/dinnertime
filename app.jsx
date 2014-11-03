@@ -1,5 +1,7 @@
 'use strict';
 
+var HAS_SPEECH = ('speechSynthesis' in window)
+
 var AppStates = {
   INPUT: 'input'
 , COOKING: 'cooking'
@@ -111,7 +113,7 @@ function pluralise(howMany, suffixes) {
 }
 
 function announce(text) {
-  if ('speechSynthesis' in window) {
+  if (HAS_SPEECH) {
     speechSynthesis.speak(new SpeechSynthesisUtterance(text))
   }
 }
@@ -185,6 +187,8 @@ function linebreaks(text) {
 var CookingTimer = React.createClass({
   propTypes: {
     onFinishedCooking: React.PropTypes.func.isRequired
+  , playStepSound: React.PropTypes.bool
+  , sayInstructions: React.PropTypes.bool
   , steps: React.PropTypes.array.isRequired
   },
 
@@ -210,14 +214,16 @@ var CookingTimer = React.createClass({
     if (this.state.stepIndex != prevState.stepIndex) {
       this.announceStep(this.props.steps[this.state.stepIndex])
     }
-    if (this.state.timeToNextStep == 5) {
+    if (this.state.timeToNextStep == 5 && this.props.playStepSound) {
       this.refs.pips.getDOMNode().currentTime = 0
       this.refs.pips.getDOMNode().play()
     }
   },
 
   announceStep: function(step) {
-    announce(step.instructions.split('\n').join('. '))
+    if (this.props.sayInstructions) {
+      announce(step.instructions.split('\n').join('. '))
+    }
   },
 
   tick: function() {
@@ -287,9 +293,9 @@ var CookingTimer = React.createClass({
         </div>
       </h3>
       <button type="button" onClick={this.fastForward.bind(this, this.state.timeToNextStep)}>Fast-Forward</button>
-      <audio ref="pips">
+      {this.props.playStepSound && <audio ref="pips">
         <source src="pips.ogg" type="audio/ogg"/>
-      </audio>
+      </audio>}
     </div>
   }
 })
@@ -309,16 +315,18 @@ var DinnerTime = React.createClass({
     // , items: [{id: idSeed++, type: 'food', name: '', time: '', flip: false, flipType: 'Flip'}]
     , items: TEST_ITEMS
     , schedule: null
+    , sayInstructions: HAS_SPEECH
+    , playStepSound: true
     }
   },
 
   componentDidUpdate: function(prevProps, prevState) {
     if (prevState.appState != AppStates.FINISHED && this.state.appState == AppStates.FINISHED) {
-      announce('So tasty!')
+      announce("It's Dinner Time!")
     }
   },
 
-  onChange: function(index, e) {
+  onChangeItem: function(index, e) {
     var el = e.target
     var name = el.name
     var type = el.type
@@ -337,6 +345,10 @@ var DinnerTime = React.createClass({
     this.setState({
       items: React.addons.update(this.state.items, makeObj(index, stateChange))
     })
+  },
+
+  onChangeOption: function(e) {
+    this.setState(makeObj(e.target.name, e.target.checked))
   },
 
   addItem: function() {
@@ -376,7 +388,12 @@ var DinnerTime = React.createClass({
       return this.renderInput()
     }
     else if (this.state.appState == AppStates.COOKING) {
-      return <CookingTimer steps={this.state.steps} onFinishedCooking={this.handleFinishedCooking}/>
+      return <CookingTimer
+        steps={this.state.steps}
+        onFinishedCooking={this.handleFinishedCooking}
+        playStepSound={this.state.playStepSound}
+        sayInstructions={this.state.sayInstructions}
+      />
     }
     else if (this.state.appState == AppStates.FINISHED) {
       return this.renderFinished()
@@ -397,7 +414,7 @@ var DinnerTime = React.createClass({
         </thead>
         <tbody>
           {this.state.items.map(function(item, index) {
-            return <tr key={item.id} onChange={this.onChange.bind(this, index)}>
+            return <tr key={item.id} onChange={this.onChangeItem.bind(this, index)}>
               <td><input type="text" name="name" value={item.name}/></td>
               <td><input type="number" name="time" min="0" step="1" value={item.time}/></td>
               <td>
@@ -415,6 +432,22 @@ var DinnerTime = React.createClass({
       </table>
       <button type="button" onClick={this.addItem} title="Add more food">+</button>
       <p>Have you pre-heated all the things?</p>
+      {HAS_SPEECH && <div>
+        <label>
+          <input type="checkbox" name="sayInstructions"
+            onChange={this.onChangeOption}
+            checked={this.state.sayInstructions}
+          /> Say instructions aloud
+        </label>
+      </div>}
+      <div>
+        <label>
+          <input type="checkbox" name="playStepSound"
+            onChange={this.onChangeOption}
+            checked={this.state.playStepSound}
+          /> Play a sound for new steps
+        </label>
+      </div>
       <button type="button" onClick={this.startCooking}>Start Cooking</button>
     </div>
   },
