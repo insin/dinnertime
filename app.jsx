@@ -86,7 +86,7 @@ function calculateSteps(items) {
     prevStep = step
   })
 
-  steps.push({type: 'finish', time: 0})
+  steps.push({type: 'finish', time: 0, instructions: 'Eat!'})
 
   return steps
 }
@@ -116,16 +116,34 @@ function announce(text) {
   }
 }
 
-function minutesAndSeconds(seconds) {
+function hhmmss(seconds) {
+  var hours = Math.floor(seconds / 3600)
   var mins = Math.floor(seconds / 60)
   var secs = seconds % 60
-  if (mins == 0) {
-    return secs + ' second' + pluralise(secs)
+  var parts = []
+  if (hours > 0) {
+    parts.push(hours)
   }
-  if (secs == 0) {
-    return mins + ' minute' + pluralise(mins)
+  parts.push(mins)
+  parts.push(secs < 10 ? '0' + secs : secs)
+  return parts.join(':')
+}
+
+function hoursMinutesSeconds(seconds) {
+  var hours = Math.floor(seconds / 3600)
+  var mins = Math.floor(seconds / 60)
+  var secs = seconds % 60
+  var parts = []
+  if (hours > 0) {
+    parts.push(hours + ' hour' + pluralise(hours))
   }
-  return mins + ' minute' + pluralise(mins) + ' ' + secs + ' second' + pluralise(secs)
+  if (mins > 0) {
+    parts.push(mins + ' minute' + pluralise(mins))
+  }
+  if (secs > 0) {
+    parts.push(secs + ' second' + pluralise(secs))
+  }
+  return parts.join(' ')
 }
 
 function makeObj(prop, value) {
@@ -249,20 +267,25 @@ var CookingTimer = React.createClass({
   },
 
   render: function() {
+    var prevSteps = this.props.steps.slice(0, this.state.stepIndex)
     var step = this.props.steps[this.state.stepIndex]
     var nextStep = this.props.steps[this.state.stepIndex + 1]
-    var timeToNextStep = this.state.timeRemaining - nextStep.time
     return <div className="CookingTimer">
       <h1>Dinner Time in {hoursMinutesSeconds(this.state.timeRemaining)}</h1>
-      <div className="CookingTimer__elapsed">
-        {minutesAndSeconds(this.state.timeElapsed)} elapsed
-      </div>
-      <div className="CookingTimer__step">
-        {linebreaks(step.instructions)}
-      </div>
-      <div className="CookingTimer__nextstep">
-        {minutesAndSeconds(this.state.timeToNextStep)} until next step
-      </div>
+      {prevSteps.map(function(prevStep, index) {
+        return <h4 key={index} className="CookingTimer_prevstep">
+          DT minus {hhmmss(prevStep.time)} &ndash; {linebreaks(prevStep.instructions)}
+        </h4>
+      })}
+      <h2 className="CookingTimer__step">
+        DT minus {hhmmss(step.time)} &ndash; {linebreaks(step.instructions)}
+      </h2>
+      <h3 className="CookingTimer__nextstep">
+        Next step in {hoursMinutesSeconds(this.state.timeToNextStep)}:
+        <div className="CookingTimer__nextinstructions">
+          {linebreaks(nextStep.instructions)}
+        </div>
+      </h3>
       <button type="button" onClick={this.fastForward.bind(this, this.state.timeToNextStep)}>Fast-Forward</button>
       <audio ref="pips">
         <source src="pips.ogg" type="audio/ogg"/>
