@@ -1,0 +1,44 @@
+{
+  "name": "dinnertime",
+  "version": "0.1.0",
+  "description": "Cooking timer & scheduler with spoken instructions",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/insin/dinnertime.git"
+  },
+  "keywords": [
+    "cooking",
+    "food",
+    "timer",
+    "scheduler"
+  ],
+  "author": "Jonny Buchanan <jonathan.buchanan@gmail.com> (https://github.com/insin)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/insin/dinnertime/issues"
+  },
+  "homepage": "https://github.com/insin/dinnertime",
+  "dependencies": {
+    "react": "^0.12.0"
+  },
+  "devDependencies": {
+    "beepbeep": "^1.2.0",
+    "browserify": "^6.2.0",
+    "del": "^0.1.3",
+    "envify": "^3.0.0",
+    "gulp": "^3.8.9",
+    "gulp-jshint": "^1.9.0",
+    "gulp-plumber": "^0.6.6",
+    "gulp-react": "^2.0.0",
+    "gulp-rename": "^1.2.0",
+    "gulp-streamify": "0.0.5",
+    "gulp-template": "^1.1.1",
+    "gulp-uglify": "^1.0.1",
+    "gulp-util": "^3.0.1",
+    "jshint-stylish": "^1.0.0",
+    "vinyl-source-stream": "^1.0.0"
+  },
+  "scripts": {
+    "dist": "gulp dist --production"
+  }
+}

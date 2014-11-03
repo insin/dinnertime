@@ -1,0 +1,86 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+html, body, #app, .DinnerTime {
+  height: 100%;
+}
+body {
+  font-family: 'Open Sans', sans-serif;
+}
+th {
+  text-align: left;
+  font-weight: normal;
+}
+td {
+  padding-right: 12px;
+}
+input, select, button {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.Wrapper {
+  height: 100%;
+  display: table;
+  width: 100%;
+}
+.Header {
+  display: table-row;
+  height: 1px;
+  font-size: 24px;
+  text-align: center;
+}
+.Main {
+  height: 100%;
+  display: table;
+  width: 100%;
+}
+.Content {
+  display: table-cell;
+  height: 100%;
+  vertical-align: middle;
+  text-align: center;
+}
+.Footer {
+  display: table-row;
+  height:1px;
+  text-align: center;
+}
+
+.Input {
+  display: inline-block;
+  margin: 0 auto;
+  text-align: left;
+}
+.Input__header {
+  font-size: 36px;
+  text-align: center;
+}
+.Input__options {
+  margin-top: 1.25em;
+}
+.Input__option {
+  margin-bottom: 4px;
+}
+
+.CookingTimer__title {
+  display: inline-block;
+  width: 50%;
+}
+.CookingTimer__remaining {
+  display: inline-block;
+  width: 50%;
+}
+.CookingTimer__currentstep {
+  text-align: center;
+  font-size: 36px;
+  padding: 48px 6px;
+}
+.CookingTimer__nextstep {
+  text-align: center;
+  font-size: 24px;
+}
+.Finished {
+  text-align: center;
+  font-size: 128px;
+}
