@@ -362,18 +362,34 @@ var App = React.createClass({
 
   renderInput: function() {
     return <div className="Input">
-      {this.state.items.map(function(item, index) {
-        return <div className="Input__item" key={item.id} onChange={this.onChange.bind(this, index)}>
-          <label>Food: <input type="text" name="name" value={item.name}/></label>
-          <label>Cooking time: <input type="number" name="time" min="0" step="1" value={item.time}/></label>
-          <input type="checkbox" name="flip" checked={item.flip}/> <select value={item.flipType} name="flipType" disabled={!item.flip}>
-            <option>Flip</option>
-            <option>Rotate</option>
-          </select> half-way
-          <button type="button" onClick={this.deleteItem.bind(this, index)}>&times;</button>
-        </div>
-      }.bind(this))}
-      <button type="button" onClick={this.addItem}>+</button>
+      <table>
+        <thead>
+          <tr>
+            <th>Food</th>
+            <th>Cooking Time (mins)</th>
+            <th>Flip/Rotate?</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          {this.state.items.map(function(item, index) {
+            return <tr key={item.id} onChange={this.onChange.bind(this, index)}>
+              <td><input type="text" name="name" value={item.name}/></td>
+              <td><input type="number" name="time" min="0" step="1" value={item.time}/></td>
+              <td>
+                <input type="checkbox" name="flip" checked={item.flip}/>{' '}
+                {item.flip && <select value={item.flipType} name="flipType" disabled={!item.flip}>
+                  <option>Flip</option>
+                  <option>Rotate</option>
+                </select>}{' '}
+                {item.flip && 'halfway'}{/* TODO Make configurable */}
+              </td>
+              <td><button type="button" onClick={this.deleteItem.bind(this, index)} title="Remove this food">&times;</button></td>
+            </tr>
+          }.bind(this))}
+        </tbody>
+      </table>
+      <button type="button" onClick={this.addItem} title="Add more food">+</button>
       <p>Have you pre-heated all the things?</p>
       <button type="button" onClick={this.startCooking}>Start Cooking</button>
     </div>
