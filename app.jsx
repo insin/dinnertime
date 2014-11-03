@@ -11,11 +11,11 @@ var AppStates = {
 var idSeed = 1
 
 function calculateSteps(items) {
-  // Add "flip" items for half the cooking time of items which need to be
-  // flipped.
+  // Add "tend" items for half the cooking time of items which need to be
+  // tended to.
   items.forEach(function(item) {
-    if (item.flip) {
-      items.push({type: 'flip', name: item.name, time: item.time / 2, flipType: item.flipType})
+    if (item.tend) {
+      items.push({type: 'tend', name: item.name, time: item.time / 2, tendType: item.tend})
     }
   })
 
@@ -44,11 +44,11 @@ function calculateSteps(items) {
     if (item.type == 'food') {
       step.start.push(item.name)
     }
-    else if (item.type == 'flip') {
-      if (item.flipType == 'Flip') {
+    else if (item.type == 'tend') {
+      if (item.tendType == 'Flip') {
         step.flip.push(item.name)
       }
-      else if (item.flipType == 'Rotate') {
+      else if (item.tendType == 'Rotate') {
         step.rotate.push(item.name)
       }
     }
@@ -272,28 +272,38 @@ var CookingTimer = React.createClass({
     })
   },
 
+  complete: function() {
+    this.setState({
+      timeRemaining: 1
+    })
+  },
+
   render: function() {
-    var prevSteps = this.props.steps.slice(0, this.state.stepIndex)
     var step = this.props.steps[this.state.stepIndex]
     var nextStep = this.props.steps[this.state.stepIndex + 1]
-    return <div className="CookingTimer">
-      <h1>Dinner Time in {hoursMinutesSeconds(this.state.timeRemaining)}</h1>
-      <div className="CookingTimer__steps">
-        {prevSteps.map(function(prevStep, index) {
-          return <h4 key={index} className="CookingTimer_prevstep">
-            DT minus {hhmmss(prevStep.time)} &ndash; {linebreaks(prevStep.instructions)}
-          </h4>
-        })}
-        <h2 className="CookingTimer__step">
-          DT minus {hhmmss(step.time)} &ndash; {linebreaks(step.instructions)}
-        </h2>
-        <h3 className="CookingTimer__nextstep">
-          Next step in {hoursMinutesSeconds(this.state.timeToNextStep)}:
+    return <div className="Wrapper">
+      <div className="Header">
+        <div className="CookingTimer__header">
+          <div className="CookingTimer__title">Dinner Time!</div>
+          <div className="CookingTimer__remaining">Time Left: {hhmmss(this.state.timeRemaining)}</div>
+        </div>
+      </div>
+      <div className="Main"><div className="Content">
+        <div className="CookingTimer">
+          <div className="CookingTimer__currentstep">
+            [DT-{hhmmss(step.time)}] {linebreaks(step.instructions)}
+          </div>
+        </div>
+      </div></div>
+      <div className="Footer">
+        <div className="CookingTimer__nextstep">
+          Next step in {hhmmss(this.state.timeToNextStep)}:
           <div className="CookingTimer__nextinstructions">
             {linebreaks(nextStep.instructions)}
           </div>
-        </h3>
-        <button type="button" onClick={this.fastForward.bind(this, this.state.timeToNextStep)}>Fast-Forward</button>
+        </div>
+        <button type="button" onClick={this.fastForward.bind(this, this.state.timeToNextStep)}>Fast-Forward</button>{' '}
+        <button type="button" onClick={this.complete}>Complete</button>
       </div>
       {this.props.playStepSound && <audio ref="pips">
         <source src="pips.ogg" type="audio/ogg"/>
@@ -303,19 +313,18 @@ var CookingTimer = React.createClass({
 })
 
 var TEST_ITEMS = [
-  {id: 'a', type: 'food', name: 'Pizza', time: 22, flip: true, flipType: 'Rotate'}
-, {id: 'b', type: 'food', name: 'Fish Fingers', time: 15, flip: true, flipType: 'Flip'}
-, {id: 'c', type: 'food', name: 'Potato Waffles', time: 15, flip: true, flipType: 'Flip'}
-, {id: 'd', type: 'food', name: 'Rice', time: 12, flip: false, flipType: 'Flip'}
-, {id: 'e', type: 'food', name: 'Beans', time: 5, flip: false, flipType: 'Flip'}
+  {id: 'a', type: 'food', name: 'Pizza', time: 22, tend: 'Rotate'}
+, {id: 'b', type: 'food', name: 'Fish Fingers', time: 15, tend: 'Flip'}
+, {id: 'c', type: 'food', name: 'Potato Waffles', time: 15, tend: 'Flip'}
+, {id: 'd', type: 'food', name: 'Rice', time: 12, tend: ''}
+, {id: 'e', type: 'food', name: 'Beans', time: 5, tend: ''}
 ]
 
 var DinnerTime = React.createClass({
   getInitialState: function() {
     return {
       appState: AppStates.INPUT
-    // , items: [{id: idSeed++, type: 'food', name: '', time: '', flip: false, flipType: 'Flip'}]
-    , items: TEST_ITEMS
+    , items: [{id: idSeed++, type: 'food', name: '', time: '', tend: ''}]
     , schedule: null
     , sayInstructions: HAS_SPEECH
     , playStepSound: true
@@ -356,7 +365,7 @@ var DinnerTime = React.createClass({
   addItem: function() {
     this.setState({
       items: React.addons.update(this.state.items, {
-        $push: [{id: idSeed++, type: 'food', name: '', time: '', flip: false, flipType: 'Flip'}]
+        $push: [{id: idSeed++, type: 'food', name: '', time: '', tend: ''}]
       })
     })
   },
@@ -403,62 +412,72 @@ var DinnerTime = React.createClass({
   },
 
   renderInput: function() {
-    return <div className="Input">
-      <h1>Dinner Time!</h1>
-      <div className="Input__items">
-        <table>
-          <thead>
-            <tr>
-              <th>Food</th>
-              <th>Cooking Time (mins)</th>
-              <th>Flip/Rotate?</th>
-              <th>&nbsp;</th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.items.map(function(item, index) {
-              return <tr key={item.id} onChange={this.onChangeItem.bind(this, index)}>
-                <td><input type="text" name="name" value={item.name}/></td>
-                <td><input type="number" name="time" min="0" step="1" value={item.time}/></td>
-                <td>
-                  <input type="checkbox" name="flip" checked={item.flip}/>{' '}
-                  {item.flip && <select value={item.flipType} name="flipType" disabled={!item.flip}>
-                    <option>Flip</option>
-                    <option>Rotate</option>
-                  </select>}{' '}
-                  {item.flip && 'halfway'}{/* TODO Make configurable */}
-                </td>
-                <td><button type="button" onClick={this.deleteItem.bind(this, index)} title="Remove this food">&times;</button></td>
+    return <div className="Wrapper">
+      <div className="Main"><div className="Content">
+                 <div className="Input__header">Dinner Time!</div>
+          <p>Enter details of what you need to cook below and Dinner Time! will tell you when to do what.</p>
+        <div className="Input">
+
+          <table>
+            <thead>
+              <tr>
+                <th>Cook</th>
+                <th>For</th>
+                <th>Tend</th>
+                <th>&nbsp;</th>
               </tr>
-            }.bind(this))}
-          </tbody>
-        </table>
-        <button type="button" onClick={this.addItem} title="Add more food">+</button>
-        <p>Have you pre-heated all the things?</p>
-        {HAS_SPEECH && <div>
-          <label>
-            <input type="checkbox" name="sayInstructions"
-              onChange={this.onChangeOption}
-              checked={this.state.sayInstructions}
-            /> Say instructions aloud
-          </label>
-        </div>}
-        <div>
-          <label>
-            <input type="checkbox" name="playStepSound"
-              onChange={this.onChangeOption}
-              checked={this.state.playStepSound}
-            /> Play a sound for new steps
-          </label>
+            </thead>
+            <tbody>
+              {this.state.items.map(function(item, index) {
+                return <tr key={item.id} onChange={this.onChangeItem.bind(this, index)}>
+                  <td><input type="text" name="name" value={item.name}/></td>
+                  <td><input type="text" size="3" name="time" min="0" step="1" value={item.time}/> mins</td>
+                  <td>
+                    <select value={item.tend} name="tend">
+                      <option></option>
+                      <option>Flip</option>
+                      <option>Rotate</option>
+                    </select>{' '}
+                    {item.tend && 'halfway'}{/* TODO Make configurable */}
+                  </td>
+                  <td>{this.state.items.length > 1 && <button type="button" onClick={this.deleteItem.bind(this, index)} title="Remove this food">
+                    &times; Delete
+                  </button>}</td>
+                </tr>
+              }.bind(this))}
+            </tbody>
+          </table>
+          <button type="button" onClick={this.addItem} title="Add more food">+ Add More</button>
+
+          <div className="Input__options">
+            {HAS_SPEECH && <div className="Input__option">
+              <label>
+                <input type="checkbox" name="sayInstructions"
+                  onChange={this.onChangeOption}
+                  checked={this.state.sayInstructions}
+                /> Say instructions aloud
+              </label>
+            </div>}
+            <div className="Input__option">
+              <label>
+                <input type="checkbox" name="playStepSound"
+                  onChange={this.onChangeOption}
+                  checked={this.state.playStepSound}
+                /> Play a sound for new steps
+              </label>
+            </div>
+            <button type="button" onClick={this.startCooking}>Start Cooking</button>
+          </div>
         </div>
-        <button type="button" onClick={this.startCooking}>Start Cooking</button>
-      </div>
+      </div></div>
     </div>
   },
 
   renderFinished: function() {
-    return <div className="Finished">
-      <h1>It's Dinner Time!</h1>
+    return <div className="Wrapper">
+      <div className="Main"><div className="Content">
+        <div className="Finished">It's Dinner Time!</div>
+      </div></div>
     </div>
   }
 })
