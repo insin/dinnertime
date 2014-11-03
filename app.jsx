@@ -253,6 +253,7 @@ var CookingTimer = React.createClass({
     var nextStep = this.props.steps[this.state.stepIndex + 1]
     var timeToNextStep = this.state.timeRemaining - nextStep.time
     return <div className="CookingTimer">
+      <h1>Dinner Time in {hoursMinutesSeconds(this.state.timeRemaining)}</h1>
       <div className="CookingTimer__elapsed">
         {minutesAndSeconds(this.state.timeElapsed)} elapsed
       </div>
@@ -278,7 +279,7 @@ var TEST_ITEMS = [
 , {id: 'e', type: 'food', name: 'Beans', time: 5, flip: false, flipType: 'Flip'}
 ]
 
-var App = React.createClass({
+var DinnerTime = React.createClass({
   getInitialState: function() {
     return {
       appState: AppStates.INPUT
@@ -342,8 +343,7 @@ var App = React.createClass({
   },
 
   render: function() {
-    return <div className="App">
-      <h1>Dinner Time!</h1>
+    return <div className={'DinnerTime DinnerTime--' + this.state.appState}>
       {this.renderContent()}
     </div>
   },
@@ -362,6 +362,7 @@ var App = React.createClass({
 
   renderInput: function() {
     return <div className="Input">
+      <h1>Dinner Time!</h1>
       <table>
         <thead>
           <tr>
@@ -397,9 +398,9 @@ var App = React.createClass({
 
   renderFinished: function() {
     return <div className="Finished">
-      <h1>Finished Cooking!</h1>
+      <h1>It's Dinner Time!</h1>
     </div>
   }
 })
 
-React.render(<App/>, document.getElementById('app'))
+React.render(<DinnerTime/>, document.getElementById('app'))
