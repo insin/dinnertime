@@ -192,6 +192,10 @@ var CookingTimer = React.createClass({
     if (this.state.stepIndex != prevState.stepIndex) {
       this.announceStep(this.props.steps[this.state.stepIndex])
     }
+    if (this.state.timeToNextStep == 5) {
+      this.refs.pips.getDOMNode().currentTime = 0
+      this.refs.pips.getDOMNode().play()
+    }
   },
 
   announceStep: function(step) {
@@ -238,9 +242,9 @@ var CookingTimer = React.createClass({
 
   fastForward: function(timeToNextStep) {
     this.setState({
-      timeElapsed: this.state.timeElapsed + timeToNextStep - 2
-    , timeRemaining: this.state.timeRemaining - timeToNextStep + 2
-    , timeToNextStep: 2
+      timeElapsed: this.state.timeElapsed + timeToNextStep - 6
+    , timeRemaining: this.state.timeRemaining - timeToNextStep + 6
+    , timeToNextStep: 6
     })
   },
 
@@ -259,6 +263,9 @@ var CookingTimer = React.createClass({
         {minutesAndSeconds(this.state.timeToNextStep)} until next step
       </div>
       <button type="button" onClick={this.fastForward.bind(this, this.state.timeToNextStep)}>Fast-Forward</button>
+      <audio ref="pips">
+        <source src="pips.ogg" type="audio/ogg"/>
+      </audio>
     </div>
   }
 })
