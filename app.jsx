@@ -278,21 +278,23 @@ var CookingTimer = React.createClass({
     var nextStep = this.props.steps[this.state.stepIndex + 1]
     return <div className="CookingTimer">
       <h1>Dinner Time in {hoursMinutesSeconds(this.state.timeRemaining)}</h1>
-      {prevSteps.map(function(prevStep, index) {
-        return <h4 key={index} className="CookingTimer_prevstep">
-          DT minus {hhmmss(prevStep.time)} &ndash; {linebreaks(prevStep.instructions)}
-        </h4>
-      })}
-      <h2 className="CookingTimer__step">
-        DT minus {hhmmss(step.time)} &ndash; {linebreaks(step.instructions)}
-      </h2>
-      <h3 className="CookingTimer__nextstep">
-        Next step in {hoursMinutesSeconds(this.state.timeToNextStep)}:
-        <div className="CookingTimer__nextinstructions">
-          {linebreaks(nextStep.instructions)}
-        </div>
-      </h3>
-      <button type="button" onClick={this.fastForward.bind(this, this.state.timeToNextStep)}>Fast-Forward</button>
+      <div className="CookingTimer__steps">
+        {prevSteps.map(function(prevStep, index) {
+          return <h4 key={index} className="CookingTimer_prevstep">
+            DT minus {hhmmss(prevStep.time)} &ndash; {linebreaks(prevStep.instructions)}
+          </h4>
+        })}
+        <h2 className="CookingTimer__step">
+          DT minus {hhmmss(step.time)} &ndash; {linebreaks(step.instructions)}
+        </h2>
+        <h3 className="CookingTimer__nextstep">
+          Next step in {hoursMinutesSeconds(this.state.timeToNextStep)}:
+          <div className="CookingTimer__nextinstructions">
+            {linebreaks(nextStep.instructions)}
+          </div>
+        </h3>
+        <button type="button" onClick={this.fastForward.bind(this, this.state.timeToNextStep)}>Fast-Forward</button>
+      </div>
       {this.props.playStepSound && <audio ref="pips">
         <source src="pips.ogg" type="audio/ogg"/>
       </audio>}
@@ -403,52 +405,54 @@ var DinnerTime = React.createClass({
   renderInput: function() {
     return <div className="Input">
       <h1>Dinner Time!</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>Food</th>
-            <th>Cooking Time (mins)</th>
-            <th>Flip/Rotate?</th>
-            <th>&nbsp;</th>
-          </tr>
-        </thead>
-        <tbody>
-          {this.state.items.map(function(item, index) {
-            return <tr key={item.id} onChange={this.onChangeItem.bind(this, index)}>
-              <td><input type="text" name="name" value={item.name}/></td>
-              <td><input type="number" name="time" min="0" step="1" value={item.time}/></td>
-              <td>
-                <input type="checkbox" name="flip" checked={item.flip}/>{' '}
-                {item.flip && <select value={item.flipType} name="flipType" disabled={!item.flip}>
-                  <option>Flip</option>
-                  <option>Rotate</option>
-                </select>}{' '}
-                {item.flip && 'halfway'}{/* TODO Make configurable */}
-              </td>
-              <td><button type="button" onClick={this.deleteItem.bind(this, index)} title="Remove this food">&times;</button></td>
+      <div className="Input__items">
+        <table>
+          <thead>
+            <tr>
+              <th>Food</th>
+              <th>Cooking Time (mins)</th>
+              <th>Flip/Rotate?</th>
+              <th>&nbsp;</th>
             </tr>
-          }.bind(this))}
-        </tbody>
-      </table>
-      <button type="button" onClick={this.addItem} title="Add more food">+</button>
-      <p>Have you pre-heated all the things?</p>
-      {HAS_SPEECH && <div>
-        <label>
-          <input type="checkbox" name="sayInstructions"
-            onChange={this.onChangeOption}
-            checked={this.state.sayInstructions}
-          /> Say instructions aloud
-        </label>
-      </div>}
-      <div>
-        <label>
-          <input type="checkbox" name="playStepSound"
-            onChange={this.onChangeOption}
-            checked={this.state.playStepSound}
-          /> Play a sound for new steps
-        </label>
+          </thead>
+          <tbody>
+            {this.state.items.map(function(item, index) {
+              return <tr key={item.id} onChange={this.onChangeItem.bind(this, index)}>
+                <td><input type="text" name="name" value={item.name}/></td>
+                <td><input type="number" name="time" min="0" step="1" value={item.time}/></td>
+                <td>
+                  <input type="checkbox" name="flip" checked={item.flip}/>{' '}
+                  {item.flip && <select value={item.flipType} name="flipType" disabled={!item.flip}>
+                    <option>Flip</option>
+                    <option>Rotate</option>
+                  </select>}{' '}
+                  {item.flip && 'halfway'}{/* TODO Make configurable */}
+                </td>
+                <td><button type="button" onClick={this.deleteItem.bind(this, index)} title="Remove this food">&times;</button></td>
+              </tr>
+            }.bind(this))}
+          </tbody>
+        </table>
+        <button type="button" onClick={this.addItem} title="Add more food">+</button>
+        <p>Have you pre-heated all the things?</p>
+        {HAS_SPEECH && <div>
+          <label>
+            <input type="checkbox" name="sayInstructions"
+              onChange={this.onChangeOption}
+              checked={this.state.sayInstructions}
+            /> Say instructions aloud
+          </label>
+        </div>}
+        <div>
+          <label>
+            <input type="checkbox" name="playStepSound"
+              onChange={this.onChangeOption}
+              checked={this.state.playStepSound}
+            /> Play a sound for new steps
+          </label>
+        </div>
+        <button type="button" onClick={this.startCooking}>Start Cooking</button>
       </div>
-      <button type="button" onClick={this.startCooking}>Start Cooking</button>
     </div>
   },
 
