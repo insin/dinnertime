@@ -57,30 +57,20 @@ var Planner = React.createClass({
 
   onSubmit: function(e) {
     e.preventDefault()
+    // Validate all forms' current input data (set by onChange events)
     var itemFormset = this.state.itemFormset
     var optionsForm = this.state.optionsForm
-
-    // TODO Add this sort of validation forcing based on whatever data's been
-    //      populated so far by onChange handling to newforms.
-    itemFormset.forms().forEach(function(form) {
-      form.isInitialRender = false
-      form.fullClean()
-    })
-    itemFormset.isInitialRender = false
-    itemFormset.fullClean()
-    optionsForm.isInitialRender = false
-    optionsForm.fullClean()
-
-    if (!itemFormset.isValid() || !optionsForm.isValid()) {
+    if ([itemFormset.validate(),
+         optionsForm.validate()].indexOf(false) != -1) {
       return this.forceUpdate()
     }
-
+    // Validate that at least one form was filled in
     var items = itemFormset.cleanedData()
     if (items.length === 0) {
       itemFormset.addError('Add details of at least one thing to cook.')
       return this.forceUpdate()
     }
-
+    // If we're good, call back to our parent component
     this.props.onStartCooking(extend(optionsForm.cleanedData, {items: items}))
   },
 
