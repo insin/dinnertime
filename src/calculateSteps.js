@@ -33,7 +33,7 @@ function calculateSteps(items) {
       step = {start: [], flip: [], rotate: [], time: item.time, instructions: null, duration: null}
       steps.push(step)
     }
-    if (item.type == 'food') {
+    if (!item.type) {
       step.start.push(item.name)
     }
     else if (item.type == 'tend') {

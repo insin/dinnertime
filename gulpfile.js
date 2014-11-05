@@ -59,6 +59,7 @@ gulp.task('build-app', ['lint'], function() {
   })
   b.external('react/addons')
   b.external('react')
+  b.external('newforms')
   b.transform('envify')
 
   var stream = b.bundle()
@@ -102,6 +103,7 @@ gulp.task('build-deps', function() {
   var b = browserify({detectGlobals: false})
   b.require('react/addons')
   b.require('react/addons', {expose: 'react'})
+  b.require('newforms')
   b.transform('envify')
 
   return b.bundle()
