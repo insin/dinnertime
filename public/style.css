@@ -30,7 +30,7 @@ input, select, button {
   background-color: #fee !important;
   cursor: help;
 }
-.required.valid input {
+.notempty .required.valid input {
   background-color: #efe !important;
 }
 
