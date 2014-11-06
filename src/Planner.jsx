@@ -51,12 +51,10 @@ var Planner = React.createClass({
 
   addItem: function() {
     this.state.itemFormset.addAnother()
-    this.forceUpdate()
   },
 
   deleteItem: function(index) {
     this.state.itemFormset.removeForm(index)
-    this.forceUpdate()
   },
 
   onSubmit: function(e) {
