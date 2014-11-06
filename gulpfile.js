@@ -145,4 +145,4 @@ gulp.task('watch', ['copy-app'], function() {
   gulp.watch('./public/*.css', ['dist-css'])
 })
 
-gulp.task('default', ['watch'])
+gulp.task('default', ['dist', 'watch'])
