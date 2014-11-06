@@ -15,16 +15,23 @@ th {
 td {
   padding-right: 12px;
 }
-td.error input {
-  background-color: #fdd;
-  cursor: help;
-}
 p.error {
   background-color: #fdd;
   padding: 4px;
 }
 input, select, button {
   font-family: 'Open Sans', sans-serif;
+}
+
+.notempty .required input {
+  background-color: #eef;
+}
+.error input {
+  background-color: #fee !important;
+  cursor: help;
+}
+.required.valid input {
+  background-color: #efe !important;
 }
 
 .Wrapper {

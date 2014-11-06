@@ -6,13 +6,17 @@ var React = require('react/addons')
 var extend = require('./utils/extend')
 var speech = require('./utils/speech')
 
+var cx = React.addons.classSet
+
 var ItemForm = Forms.Form.extend({
   name: Forms.CharField(),
   time: Forms.IntegerField({minValue: 1,maxLength: 3,
     widget: Forms.TextInput({attrs: {size: 3}})
   }),
   tend: Forms.ChoiceField({required: false, choices: ['', 'Flip', 'Rotate']}),
-  errorCssClass: 'error'
+  errorCssClass: 'error',
+  requiredCssClass: 'required',
+  validCssClass: 'valid'
 })
 
 var ItemFormSet = Forms.formsetFactory(ItemForm, {extra: 3})
@@ -97,7 +101,7 @@ var Planner = React.createClass({
               <tbody>
                 {this.state.itemFormset.forms().map(function(itemForm, index) {
                   var fields = itemForm.boundFieldsObj()
-                  return <tr key={index}>
+                  return <tr key={index} className={cx({notempty: itemForm.notEmpty()})}>
                     <td className={fields.name.cssClasses()}>{fields.name.render({attrs: {title: fields.name.errorMessage()}})}</td>
                     <td className={fields.time.cssClasses()}>{fields.time.render({attrs: {title: fields.time.errorMessage()}})} mins</td>
                     <td className={fields.tend.cssClasses()}>
