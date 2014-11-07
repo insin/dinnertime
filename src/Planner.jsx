@@ -33,14 +33,10 @@ var Planner = React.createClass({
 
   getInitialState: function() {
     return {
-      itemFormset: new ItemFormSet({
-        onStateChange: this.onFormChange
-      , validation: 'auto'
-      })
+      itemFormset: new ItemFormSet({onChange: this.onFormChange})
     , optionsForm: new OptionsForm({
-        onStateChange: this.onFormChange
+        onChange: this.onFormChange
       , initial: {sayInstructions: speech.hasSpeech, playStepSound: true}
-      , validation: 'auto'
       })
     }
   },
