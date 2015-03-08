@@ -1,6 +1,6 @@
 'use strict';
 
-var Forms = require('newforms')
+var forms = require('newforms')
 var React = require('react/addons')
 
 var extend = require('./utils/extend')
@@ -8,22 +8,31 @@ var speech = require('./utils/speech')
 
 var cx = React.addons.classSet
 
-var ItemForm = Forms.Form.extend({
-  name: Forms.CharField(),
-  time: Forms.IntegerField({minValue: 1,maxLength: 3,
-    widget: Forms.TextInput({attrs: {size: 3}})
+var ItemForm = forms.Form.extend({
+  name: forms.CharField(),
+  time: forms.IntegerField({minValue: 1, maxLength: 3,
+    widget: forms.TextInput({attrs: {size: 3}})
   }),
-  tend: Forms.ChoiceField({required: false, choices: ['', 'Flip', 'Rotate']}),
+  tend: forms.ChoiceField({required: false, choices: ['', 'Flip', 'Rotate']}),
   errorCssClass: 'error',
   requiredCssClass: 'required',
   validCssClass: 'valid'
 })
 
-var ItemFormSet = Forms.formsetFactory(ItemForm, {extra: 3})
+var ItemFormSet = forms.FormSet.extend({
+  form: ItemForm,
+  extra: 3,
+  clean: function() {
+    var cleanedData = this.cleanedData()
+    if (cleanedData.length === 0) {
+      throw forms.ValidationError('Add details of at least one thing to cook.')
+    }
+  }
+})
 
-var OptionsForm = Forms.Form.extend({
-  sayInstructions: Forms.BooleanField({required: false, label: 'Say instructions aloud'}),
-  playStepSound: Forms.BooleanField({required: false, label: 'Play a sound for new steps'})
+var OptionsForm = forms.Form.extend({
+  sayInstructions: forms.BooleanField({required: false, label: 'Say instructions aloud'}),
+  playStepSound: forms.BooleanField({required: false, label: 'Play a sound for new steps'})
 })
 
 var Planner = React.createClass({
@@ -62,14 +71,10 @@ var Planner = React.createClass({
          optionsForm.validate()].indexOf(false) != -1) {
       return this.forceUpdate()
     }
-    // Validate that at least one form was filled in
-    var items = itemFormset.cleanedData()
-    if (items.length === 0) {
-      itemFormset.addError('Add details of at least one thing to cook.')
-      return this.forceUpdate()
-    }
     // If we're good, call back to our parent component
-    this.props.onStartCooking(extend(optionsForm.cleanedData, {items: items}))
+    this.props.onStartCooking(extend(optionsForm.cleanedData, {
+      items: itemFormset.cleanedData()
+    }))
   },
 
   render: function() {
