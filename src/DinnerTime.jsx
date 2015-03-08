@@ -9,7 +9,7 @@ var Finished = require('./Finished')
 var Planner = require('./Planner')
 
 var DinnerTime = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       appState: AppStates.INPUT
     , items: null
@@ -19,7 +19,7 @@ var DinnerTime = React.createClass({
     }
   },
 
-  handleStartCooking: function(options) {
+  handleStartCooking(options) {
     this.setState({
       appState: AppStates.COOKING
     , items: options.items
@@ -29,19 +29,19 @@ var DinnerTime = React.createClass({
     })
   },
 
-  handleFinishedCooking: function() {
+  handleFinishedCooking() {
     this.setState({
       appState: AppStates.FINISHED
     })
   },
 
-  render: function() {
+  render() {
     return <div className={'DinnerTime DinnerTime--' + this.state.appState}>
       {this.renderContent()}
     </div>
   },
 
-  renderContent: function() {
+  renderContent() {
     if (this.state.appState == AppStates.INPUT) {
       return <Planner onStartCooking={this.handleStartCooking}/>
     }

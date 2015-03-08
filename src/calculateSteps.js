@@ -5,23 +5,21 @@ var sentenceJoin = require('./utils/sentenceJoin')
 function calculateSteps(items) {
   // Add "tend" items for half the cooking time of items which need to be
   // tended to.
-  items.forEach(function(item) {
+  items.forEach(item => {
     if (item.tend) {
       items.push({type: 'tend', name: item.name, time: item.time / 2, tendType: item.tend})
     }
   })
 
   // Sort items by time, descending, to get the order things need to happen in
-  items.sort(function(a, b) {
-    return b.time - a.time
-  })
+  items.sort((a, b) => b.time - a.time)
 
   var steps = []
 
   // Walk items, generating steps with tasks and time from the end of cooking
   // they need to happen at.
   var step = null
-  items.forEach(function(item) {
+  items.forEach(item => {
     if (step == null) {
       step = {start: [item.name], flip: [], rotate: [], time: item.time, instructions: null, duration: null}
       steps.push(step)
@@ -50,7 +48,7 @@ function calculateSteps(items) {
   // and durations now the different tasks which need to happen at the same time
   // have been grouped together.
   var prevStep = null
-  steps.forEach(function(step) {
+  steps.forEach(step => {
     var instructions = ''
     if (step.start.length) {
       instructions += 'Start cooking ' + sentenceJoin(step.start) + '.'

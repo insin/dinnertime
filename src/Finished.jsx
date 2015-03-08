@@ -5,11 +5,11 @@ var React = require('react')
 var speech = require('./utils/speech')
 
 var Finished = React.createClass({
-  componentWillMount: function() {
+  componentWillMount() {
       speech.speak("It's Dinner Time!")
   },
 
-  render: function() {
+  render() {
     return <div className="Wrapper">
       <div className="Main"><div className="Content">
         <div className="Finished">It's Dinner Time!</div>

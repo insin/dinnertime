@@ -14,7 +14,7 @@ var CookingTimer = React.createClass({
   , steps: React.PropTypes.array.isRequired
   },
 
-  getInitialState: function() {
+  getInitialState() {
     return {
       timeElapsed: 0
     , timeRemaining: this.props.steps[0].time
@@ -23,16 +23,16 @@ var CookingTimer = React.createClass({
     }
   },
 
-  componentWillMount: function() {
+  componentWillMount() {
     this.announceStep(this.props.steps[0])
     this.timer = setInterval(this.tick, 1000)
   },
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     clearInterval(this.timer)
   },
 
-  componentDidUpdate: function(prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.state.stepIndex != prevState.stepIndex) {
       this.announceStep(this.props.steps[this.state.stepIndex])
     }
@@ -42,13 +42,13 @@ var CookingTimer = React.createClass({
     }
   },
 
-  announceStep: function(step) {
+  announceStep(step) {
     if (this.props.sayInstructions) {
       speech.speak(step.instructions.split('\n').join('. '))
     }
   },
 
-  tick: function() {
+  tick() {
     var timeElapsed = this.state.timeElapsed + 1
     var timeRemaining = this.state.timeRemaining - 1
     var timeToNextStep = this.state.timeToNextStep - 1
@@ -86,7 +86,7 @@ var CookingTimer = React.createClass({
     }
   },
 
-  fastForward: function(timeToNextStep) {
+  fastForward(timeToNextStep) {
     this.setState({
       timeElapsed: this.state.timeElapsed + timeToNextStep - 6
     , timeRemaining: this.state.timeRemaining - timeToNextStep + 6
@@ -94,13 +94,13 @@ var CookingTimer = React.createClass({
     })
   },
 
-  complete: function() {
+  complete() {
     this.setState({
       timeRemaining: 1
     })
   },
 
-  render: function() {
+  render() {
     var debugControls
     if ('development' === process.env.NODE_ENV) {
       debugControls = <div>

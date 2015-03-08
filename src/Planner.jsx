@@ -22,7 +22,7 @@ var ItemForm = forms.Form.extend({
 var ItemFormSet = forms.FormSet.extend({
   form: ItemForm,
   extra: 3,
-  clean: function() {
+  clean() {
     var cleanedData = this.cleanedData()
     if (cleanedData.length === 0) {
       throw forms.ValidationError('Add details of at least one thing to cook.')
@@ -40,7 +40,7 @@ var Planner = React.createClass({
     onStartCooking: React.PropTypes.func.isRequired
   },
 
-  getInitialState: function() {
+  getInitialState() {
     return {
       itemFormset: new ItemFormSet({onChange: this.onFormChange})
     , optionsForm: new OptionsForm({
@@ -50,19 +50,19 @@ var Planner = React.createClass({
     }
   },
 
-  onFormChange: function() {
+  onFormChange() {
     this.forceUpdate()
   },
 
-  addItem: function() {
+  addItem() {
     this.state.itemFormset.addAnother()
   },
 
-  deleteItem: function(index) {
+  deleteItem(index) {
     this.state.itemFormset.removeForm(index)
   },
 
-  onSubmit: function(e) {
+  onSubmit(e) {
     e.preventDefault()
     // Validate all forms' current input data (set by onChange events)
     var itemFormset = this.state.itemFormset
@@ -77,7 +77,7 @@ var Planner = React.createClass({
     }))
   },
 
-  render: function() {
+  render() {
     var itemCount = this.state.itemFormset.totalFormCount()
     var nonFormErrors = this.state.itemFormset.nonFormErrors()
     var optionFields = this.state.optionsForm.boundFieldsObj()
@@ -98,7 +98,7 @@ var Planner = React.createClass({
                 </tr>
               </thead>
               <tbody>
-                {this.state.itemFormset.forms().map(function(itemForm, index) {
+                {this.state.itemFormset.forms().map((itemForm, index) => {
                   var fields = itemForm.boundFieldsObj()
                   return <tr key={index} className={cx({notempty: itemForm.notEmpty()})}>
                     <td className={fields.name.cssClasses()}>{fields.name.render({attrs: {title: fields.name.errorMessage()}})}</td>
@@ -113,7 +113,7 @@ var Planner = React.createClass({
                       </button>}
                     </td>
                   </tr>
-                }.bind(this))}
+                })}
               </tbody>
             </table>
             <button type="button" onClick={this.addItem} title="Add more food">+ Add More</button>

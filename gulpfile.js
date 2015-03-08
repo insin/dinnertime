@@ -15,8 +15,7 @@ var uglify = require('gulp-uglify')
 var pkg = require('./package.json')
 var production = gutil.env.production
 
-var jsSrcFiles = './src/**/*.js'
-var jsxSrcFiles = jsSrcFiles + 'x'
+var jsSrcFiles = './src/**/*.js*'
 var jsBuildFiles = './build/modules/**/*.js'
 var jsExt = (production ? 'min.js' : 'js')
 
@@ -28,21 +27,15 @@ gulp.task('clean-modules', function(cb) {
   del('./build/modules/**', cb)
 })
 
-/** Copy non-jsx JavaScript to /build/modules */
-gulp.task('copy-js', ['clean-modules'], function() {
+gulp.task('transpile-js', ['clean-modules'], function() {
   return gulp.src(jsSrcFiles)
-    .pipe(gulp.dest('./build/modules'))
-})
-
-gulp.task('transpile-jsx', ['clean-modules'], function() {
-  return gulp.src(jsxSrcFiles)
     .pipe(plumber())
-    .pipe(react())
+    .pipe(react({harmony: true}))
     .pipe(gulp.dest('./build/modules'))
 })
 
 /** Lint everything in /build/modules */
-gulp.task('lint', ['copy-js', 'transpile-jsx'], function() {
+gulp.task('lint', ['transpile-js'], function() {
   return gulp.src(jsBuildFiles)
     .pipe(jshint('./.jshintrc'))
     .pipe(jshint.reporter('jshint-stylish'))
@@ -141,7 +134,7 @@ gulp.task('dist-css', function() {
 })
 
 gulp.task('watch', ['copy-app'], function() {
-  gulp.watch([jsSrcFiles, jsxSrcFiles], ['copy-app'])
+  gulp.watch(jsSrcFiles, ['copy-app'])
   gulp.watch('./public/*.css', ['dist-css'])
 })
 
