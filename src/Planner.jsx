@@ -1,12 +1,10 @@
 'use strict';
 
 var forms = require('newforms')
-var React = require('react/addons')
+var React = require('react')
 
 var extend = require('./utils/extend')
 var speech = require('./utils/speech')
-
-var cx = React.addons.classSet
 
 var ItemForm = forms.Form.extend({
   name: forms.CharField(),
@@ -100,7 +98,7 @@ var Planner = React.createClass({
               <tbody>
                 {this.state.itemFormset.forms().map((itemForm, index) => {
                   var fields = itemForm.boundFieldsObj()
-                  return <tr key={index} className={cx({notempty: itemForm.notEmpty()})}>
+                  return <tr key={index} className={itemForm.notEmpty() && 'notempty'}>
                     <td className={fields.name.cssClasses()}>{fields.name.render({attrs: {title: fields.name.errorMessage()}})}</td>
                     <td className={fields.time.cssClasses()}>{fields.time.render({attrs: {title: fields.time.errorMessage()}})} mins</td>
                     <td className={fields.tend.cssClasses()}>
